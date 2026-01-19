@@ -524,7 +524,8 @@ function showCheckpoint(){
   }
 
   textEl.textContent =
-    `ענית נכון על ${batchCorrect} מתוך ${CHECKPOINT_EVERY} שאלות בסיבוב הזה.${suffix} שנמשיך לסיבוב הבא?`;
+    "ענית נכון על " + batchCorrect + " מתוך " + CHECKPOINT_EVERY +
+    " שאלות בסיבוב הזה." + suffix + " שנמשיך לסיבוב הבא?";
 
   cp.style.display = "block";
 }
@@ -690,6 +691,7 @@ document.getElementById("modalBackdrop").addEventListener("click", closeConfirmM
 </script>
 </body>
 </html>
+
 
 
 
