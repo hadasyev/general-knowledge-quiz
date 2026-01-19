@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>חידון ידע כללי</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --card:#121a33;
+      --muted:#9aa4c7;
+      --text:#eef1ff;
+      --border:rgba(255,255,255,0.08);
+      --shadow: 0 18px 45px rgba(0,0,0,0.35);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans Hebrew", sans-serif;
+      background: radial-gradient(1200px 600px at 80% -10%, rgba(120,140,255,0.25), transparent 60%),
+                  radial-gradient(900px 500px at 10% 10%, rgba(0,220,255,0.18), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+    .wrap{
+      width:min(920px, 100%);
+      display:grid;
+      gap:18px;
+    }
+    header{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      padding:8px 6px;
+    }
+    h1{
+      margin:0;
+      font-size: clamp(20px, 3vw, 28px);
+      letter-spacing: 0.2px;
+    }
+    .stats{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .pill{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      padding:8px 10px;
+      border-radius: 999px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.22);
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card-inner{ padding: 22px; }
+    .q-title{
+      margin:0 0 14px 0;
+      font-size: clamp(18px, 2.5vw, 22px);
+      line-height:1.35;
+    }
+    .q-meta{
+      margin:0 0 16px 0;
+      color:var(--muted);
+      font-size:13px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .answers{
+      display:grid;
+      gap:12px;
+      margin-top:12px;
+    }
+    button.answer{
+      width:100%;
+      text-align:right;
+      padding:14px 14px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,0.18);
+      color:var(--text);
+      cursor:pointer;
+      font-size:16px;
+      line-height:1.35;
+      transition: transform .06s ease, background .15s ease, border-color .15s ease;
+    }
+    button.answer:hover{ transform: translateY(-1px); background: rgba(255,255,255,0.06); }
+    button.answer:disabled{ cursor:not-allowed; opacity:0.85; transform:none; }
+    .feedback{
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color:var(--muted);
+      display:none;
+    }
+    .feedback.good{ color: #b9f6d0; }
+    .feedback.bad{ color: #ffb6b6; }
+    .actions{
+      display:flex;
+      gap:10px;
+      justify-content:space-between;
+      align-items:center;
+      padding: 14px 18px;
+      border-top:1px solid var(--border);
+      background: rgba(0,0,0,0.15);
+      flex-wrap:wrap;
+    }
+    .btn{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-size:14px;
+    }
+    .btn:hover{ background: rgba(255,255,255,0.10); }
+    .btn.secondary{ background: rgba(0,0,0,0.12); }
+    .btn.secondary:hover{ background: rgba(255,255,255,0.06); }
+    .small{
+      color:var(--muted);
+      font-size:13px;
+    }
+    footer{
+      color:var(--muted);
+      font-size:13px;
+      padding: 0 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>חידון ידע כללי</h1>
+        <div class="small">שאלה אחרי שאלה, 4 אפשרויות, בלי חזרות (נשמר בדפדפן).</div>
+      </div>
+      <div class="stats">
+        <div class="pill">ניקוד: <span id="score">0</span></div>
+        <div class="pill">נשאלו: <span id="asked">0</span></div>
+        <div class="pill">נותרו: <span id="remaining">0</span></div>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="card-inner">
+        <p class="q-meta">
+          <span>קטגוריה: <strong id="category">—</strong></span>
+          <span>רמה: <strong id="difficulty">—</strong></span>
+        </p>
+        <h2 class="q-title" id="question">טוען שאלה…</h2>
+
+        <div class="answers" id="answers"></div>
+
+        <div class="feedback" id="feedback"></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="nextBtn" disabled>שאלה הבאה</button>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn secondary" id="resetSessionBtn">איפוס סשן (ללא מחיקת מאגר)</button>
+          <button class="btn secondary" id="clearHistoryBtn">מחיקת היסטוריית "נשאלו" (localStorage)</button>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      טיפ: כדי להוסיף שאלות, חפשי בקוד את <code>QUESTION_BANK</code> והוסיפי אובייקטים חדשים.
+    </footer>
+  </div>
+
+<script>
+  // --- 1) מאגר שאלות (דוגמא). הוסיפי/ערכי כאן ---
+  // correctIndex הוא 0-3 בהתאם למיקום התשובה ב-choices
+  const QUESTION_BANK = [
+ {"id":"gk-001","category":"היסטוריה","difficulty":"בינונית","question":"באיזו שנה נפלה חומת ברלין?","choices":["1987","1989","1991","1993"],"correctIndex":1},
+  {"id":"gk-002","category":"מדע","difficulty":"בינונית","question":"מהו היסוד הכימי שמספרו האטומי 26?","choices":["נחושת","אבץ","ברזל","ניקל"],"correctIndex":2},
+  {"id":"gk-003","category":"גאוגרפיה","difficulty":"בינונית","question":"מהי עיר הבירה של קנדה?","choices":["טורונטו","ונקובר","אוטווה","מונטריאול"],"correctIndex":2},
+  {"id":"gk-004","category":"תרבות","difficulty":"בינונית","question":"מי כתב את המחזה \"המלט\"?","choices":["ויליאם שייקספיר","אנטון צ'כוב","מולייר","הנריק איבסן"],"correctIndex":0},
+  {"id":"gk-005","category":"כלכלה","difficulty":"מתקדמת","question":"מהו המונח המתאר עלייה כללית ומתמשכת ברמת המחירים במשק?","choices":["דפלציה","אינפלציה","מיתון","צמיחה"],"correctIndex":1},
+
+  {"id":"gk-006","category":"מדע","difficulty":"קל","question":"כמה כוכבי לכת יש במערכת השמש?","choices":["7","8","9","10"],"correctIndex":1},
+  {"id":"gk-007","category":"גאוגרפיה","difficulty":"קל","question":"איזו יבשת היא הגדולה ביותר לפי שטח?","choices":["אפריקה","אסיה","אירופה","אמריקה הדרומית"],"correctIndex":1},
+  {"id":"gk-008","category":"מדע","difficulty":"בינונית","question":"איזה איבר אחראי בעיקר על סינון רעלים מהדם?","choices":["לב","כבד","ריאות","קיבה"],"correctIndex":1},
+  {"id":"gk-009","category":"היסטוריה","difficulty":"קל","question":"מי היה הנשיא הראשון של ארצות הברית?","choices":["תומס ג'פרסון","ג'ורג' וושינגטון","אברהם לינקולן","ג'ון אדמס"],"correctIndex":1},
+  {"id":"gk-010","category":"מתמטיקה","difficulty":"קל","question":"מהו הערך של 7×8?","choices":["54","56","64","58"],"correctIndex":1},
+
+  {"id":"gk-011","category":"מדע","difficulty":"קל","question":"מהי הפלנטה הקרובה ביותר לשמש?","choices":["נוגה","כדור הארץ","כוכב חמה","מאדים"],"correctIndex":2},
+  {"id":"gk-012","category":"גאוגרפיה","difficulty":"קל","question":"מהו האוקיינוס הגדול ביותר?","choices":["האוקיינוס האטלנטי","האוקיינוס השקט","האוקיינוס ההודי","האוקיינוס הארקטי"],"correctIndex":1},
+  {"id":"gk-013","category":"תרבות","difficulty":"קל","question":"איזה צבע מתקבל מערבוב כחול וצהוב?","choices":["סגול","ירוק","כתום","חום"],"correctIndex":1},
+  {"id":"gk-014","category":"היסטוריה","difficulty":"בינונית","question":"באיזו שנה החלה מלחמת העולם הראשונה?","choices":["1914","1917","1939","1905"],"correctIndex":0},
+  {"id":"gk-015","category":"מדע","difficulty":"בינונית","question":"מהי יחידת המידה של עוצמת זרם חשמלי?","choices":["וולט","אמפר","אוהם","וואט"],"correctIndex":1},
+
+  {"id":"gk-016","category":"טבע","difficulty":"קל","question":"איזו חיה היא היונק הגדול ביותר בעולם?","choices":["פיל אפריקאי","לווייתן כחול","היפופוטם","דב קוטב"],"correctIndex":1},
+  {"id":"gk-017","category":"גאוגרפיה","difficulty":"קל","question":"איזו מדינה היא הגדולה בעולם לפי שטח?","choices":["קנדה","ארצות הברית","רוסיה","סין"],"correctIndex":2},
+  {"id":"gk-018","category":"מדע","difficulty":"מתקדמת","question":"מהו ה-pH של מים טהורים בטמפרטורת חדר?","choices":["5","7","9","11"],"correctIndex":1},
+  {"id":"gk-019","category":"ספרות","difficulty":"בינונית","question":"מי כתב את \"הזקן והים\"?","choices":["ארנסט המינגווי","פיצג'רלד","אורוול","קפקא"],"correctIndex":0},
+  {"id":"gk-020","category":"כלכלה","difficulty":"בינונית","question":"מהו המונח המתאר ירידה כללית ברמת המחירים במשק?","choices":["אינפלציה","דפלציה","סטגנציה","ליברליזציה"],"correctIndex":1},
+
+  {"id":"gk-021","category":"גאוגרפיה","difficulty":"בינונית","question":"איזו מדינה היא ביתם של הפירמידות בגיזה?","choices":["ירדן","מצרים","תוניסיה","סודן"],"correctIndex":1},
+  {"id":"gk-022","category":"מדע","difficulty":"בינונית","question":"מהו הגז הנפוץ ביותר באטמוספרה של כדור הארץ?","choices":["חמצן","פחמן דו-חמצני","חנקן","ארגון"],"correctIndex":2},
+  {"id":"gk-023","category":"ספרות","difficulty":"בינונית","question":"מי כתבה את הספר \"גאווה ודעה קדומה\"?","choices":["אמילי ברונטה","ג'יין אוסטן","מרי שלי","וירג'יניה וולף"],"correctIndex":1},
+  {"id":"gk-024","category":"היסטוריה","difficulty":"בינונית","question":"באיזו שנה הסתיימה מלחמת העולם השנייה באירופה?","choices":["1943","1945","1947","1950"],"correctIndex":1},
+  {"id":"gk-025","category":"ספורט","difficulty":"קל","question":"כמה שחקנים יש על המגרש בכל קבוצה בכדורגל?","choices":["9","10","11","12"],"correctIndex":2},
+
+  {"id":"gk-026","category":"מדע","difficulty":"בינונית","question":"מהו שם התהליך שבו צמחים מייצרים סוכר באמצעות אור השמש?","choices":["נשימה תאית","תסיסה","פוטוסינתזה","אוסמוזה"],"correctIndex":2},
+  {"id":"gk-027","category":"גאוגרפיה","difficulty":"בינונית","question":"איזה הר הוא הגבוה בעולם מעל פני הים?","choices":["אוורסט","קילימנג'רו","מקינלי (דנאלי)","אלברוס"],"correctIndex":0},
+  {"id":"gk-028","category":"תרבות","difficulty":"בינונית","question":"איזה כלי נגינה הוא בעל קלידים ומיתרים ומפיק צליל בעזרת פטישים?","choices":["כינור","פסנתר","חליל","צ'לו"],"correctIndex":1},
+  {"id":"gk-029","category":"מדע","difficulty":"קל","question":"מהו הכוכב הקרוב ביותר לכדור הארץ?","choices":["פרוקסימה קנטאורי","השמש","סיריוס","בטלג'וז"],"correctIndex":1},
+  {"id":"gk-030","category":"מתמטיקה","difficulty":"קל","question":"מהו המספר הראשוני הקטן ביותר?","choices":["0","1","2","3"],"correctIndex":2},
+
+  {"id":"gk-031","category":"היסטוריה","difficulty":"בינונית","question":"איזו אימפריה בנתה את הקולוסיאום?","choices":["האימפריה היוונית","האימפריה הרומית","האימפריה הפרסית","האימפריה העות'מאנית"],"correctIndex":1},
+  {"id":"gk-032","category":"מדע","difficulty":"בינונית","question":"איזו מתכת היא נוזלית בטמפרטורת חדר?","choices":["אלומיניום","ברזל","כספית","נחושת"],"correctIndex":2},
+  {"id":"gk-033","category":"גאוגרפיה","difficulty":"בינונית","question":"איזו מדינה מכונה \"ארץ השמש העולה\"?","choices":["קוריאה הדרומית","יפן","סין","וייטנאם"],"correctIndex":1},
+  {"id":"gk-034","category":"תרבות","difficulty":"קל","question":"איזו שפה היא המדוברת ביותר בעולם מבחינת מספר דוברים ילידים?","choices":["אנגלית","ספרדית","מנדרינית","ערבית"],"correctIndex":2},
+  {"id":"gk-035","category":"מדע","difficulty":"בינונית","question":"מהו שם הגלקסיה שבה נמצא כדור הארץ?","choices":["אנדרומדה","שביל החלב","משולש","ענן מגלן הגדול"],"correctIndex":1},
+
+  {"id":"gk-036","category":"ספורט","difficulty":"בינונית","question":"כמה נקודות שווה סל מחוץ לקשת ב-NBA?","choices":["1","2","3","4"],"correctIndex":2},
+  {"id":"gk-037","category":"היסטוריה","difficulty":"מתקדמת","question":"איזה מסמך אמריקאי נחתם ב-1776?","choices":["החוקה","מגילת העצמאות","מגילת הזכויות","הצהרת פריז"],"correctIndex":1},
+  {"id":"gk-038","category":"מדע","difficulty":"בינונית","question":"מהו שם החלק בתא שמכיל את החומר הגנטי?","choices":["מיטוכונדריה","ריבוזום","גרעין התא","ליזוזום"],"correctIndex":2},
+  {"id":"gk-039","category":"גאוגרפיה","difficulty":"בינונית","question":"איזו מדינה היא הגדולה ביותר בדרום אמריקה לפי שטח?","choices":["ארגנטינה","ברזיל","פרו","צ'ילה"],"correctIndex":1},
+  {"id":"gk-040","category":"תרבות","difficulty":"בינונית","question":"מי צייר את המונה ליזה?","choices":["מיכלאנג'לו","לאונרדו דה וינצ'י","רמברנדט","ואן גוך"],"correctIndex":1},
+
+  {"id":"gk-041","category":"מדע","difficulty":"בינונית","question":"מהי מהירות האור בקירוב בריק?","choices":["300,000 ק\"מ/שנייה","30,000 ק\"מ/שנייה","3,000 ק\"מ/שנייה","3,000,000 ק\"מ/שנייה"],"correctIndex":0},
+  {"id":"gk-042","category":"היסטוריה","difficulty":"בינונית","question":"איזו עיר נקברה בהתפרצות הר וזוב בשנת 79 לספירה?","choices":["אתונה","רומא","פומפיי","קרתגו"],"correctIndex":2},
+  {"id":"gk-043","category":"מתמטיקה","difficulty":"בינונית","question":"כמה מעלות יש במשולש (סכום הזוויות)?","choices":["90","180","270","360"],"correctIndex":1},
+  {"id":"gk-044","category":"גאוגרפיה","difficulty":"בינונית","question":"באיזו מדינה נמצאת העיר מרקש?","choices":["אלג'יריה","מרוקו","תוניסיה","ספרד"],"correctIndex":1},
+  {"id":"gk-045","category":"מדע","difficulty":"בינונית","question":"איזה ויטמין הגוף מייצר בתגובה לחשיפה לשמש?","choices":["ויטמין A","ויטמין C","ויטמין D","ויטמין B12"],"correctIndex":2},
+
+  {"id":"gk-046","category":"ספרות","difficulty":"בינונית","question":"מי כתב את \"1984\"?","choices":["ג'ורג' אורוול","אלדוס האקסלי","ריי ברדבורי","ג'ון סטיינבק"],"correctIndex":0},
+  {"id":"gk-047","category":"טבע","difficulty":"בינונית","question":"איזה בעל חיים ידוע כ\"מלך החיות\"?","choices":["פיל","נמר","אריה","זאב"],"correctIndex":2},
+  {"id":"gk-048","category":"כלכלה","difficulty":"בינונית","question":"מהו המונח לתוצר מקומי גולמי?","choices":["GDP","CPI","PPP","IPO"],"correctIndex":0},
+  {"id":"gk-049","category":"גאוגרפיה","difficulty":"מתקדמת","question":"איזו מדינה גובלת גם באוקיינוס האטלנטי וגם באוקיינוס השקט?","choices":["ברזיל","קולומביה","ארגנטינה","צ'ילה"],"correctIndex":1},
+  {"id":"gk-050","category":"מדע","difficulty":"בינונית","question":"מהו שם הווירוס שגורם לאבעבועות רוח?","choices":["רוטה","וריצלה זוסטר","אינפלואנזה A","רינו"],"correctIndex":1},
+
+  {"id":"gk-051","category":"היסטוריה","difficulty":"בינונית","question":"איזו מהפכה החלה בצרפת בשנת 1789?","choices":["המהפכה התעשייתית","המהפכה הצרפתית","המהפכה הרוסית","המהפכה האמריקאית"],"correctIndex":1},
+  {"id":"gk-052","category":"מדע","difficulty":"בינונית","question":"איזה כוח מושך עצמים לכיוון מרכז כדור הארץ?","choices":["חיכוך","מגנטיות","כבידה","חשמל סטטי"],"correctIndex":2},
+  {"id":"gk-053","category":"תרבות","difficulty":"בינונית","question":"איזה סגנון מוזיקלי מזוהה עם מוצרט?","choices":["ג'אז","קלאסי","ראפ","רוק"],"correctIndex":1},
+  {"id":"gk-054","category":"גאוגרפיה","difficulty":"בינונית","question":"מהי עיר הבירה של אוסטרליה?","choices":["סידני","מלבורן","קנברה","פרת'"],"correctIndex":2},
+  {"id":"gk-055","category":"מדע","difficulty":"בינונית","question":"כמה כרומוזומים יש בדרך כלל בתא גוף אנושי?","choices":["23","46","64","92"],"correctIndex":1},
+
+  {"id":"gk-056","category":"היסטוריה","difficulty":"מתקדמת","question":"איזה עם עתיק בנה את העיר מאצ'ו פיצ'ו?","choices":["האצטקים","האינקה","המאיה","הספרדים"],"correctIndex":1},
+  {"id":"gk-057","category":"מתמטיקה","difficulty":"בינונית","question":"מהו הערך של π בקירוב לשתי ספרות אחרי הנקודה?","choices":["3.12","3.14","3.41","3.24"],"correctIndex":1},
+  {"id":"gk-058","category":"מדע","difficulty":"בינונית","question":"איזו מערכת בגוף אחראית להובלת חמצן וחומרי מזון?","choices":["מערכת העיכול","מערכת הנשימה","מערכת הדם","מערכת העצבים"],"correctIndex":2},
+  {"id":"gk-059","category":"גאוגרפיה","difficulty":"בינונית","question":"איזו מדינה היא הקטנה ביותר בעולם לפי שטח?","choices":["מונקו","סינגפור","קריית הוותיקן","סן מרינו"],"correctIndex":2},
+  {"id":"gk-060","category":"תרבות","difficulty":"בינונית","question":"מי כתב את \"הנסיך הקטן\"?","choices":["ז'ול ורן","אנטואן דה סנט-אכזופרי","אלבר קאמי","ויקטור הוגו"],"correctIndex":1},
+
+  {"id":"gk-061","category":"מדע","difficulty":"מתקדמת","question":"מהו שם החלק בעין שאחראי על חדות הראייה הגבוהה ביותר?","choices":["קרנית","רשתית","גומה מרכזית (פוביאה)","עדשה"],"correctIndex":2},
+  {"id":"gk-062","category":"היסטוריה","difficulty":"בינונית","question":"איזו מדינה הייתה הראשונה ששיגרה אדם לחלל?","choices":["ארצות הברית","ברית המועצות","סין","צרפת"],"correctIndex":1},
+  {"id":"gk-063","category":"גאוגרפיה","difficulty":"בינונית","question":"איזו מדינה חוצה קו המשווה וגם את קו התאריך הבינלאומי?","choices":["אקוודור","אינדונזיה","קיריבטי","ברזיל"],"correctIndex":2},
+  {"id":"gk-064","category":"כלכלה","difficulty":"בינונית","question":"איך נקרא מס שמוטל על צריכה ומתווסף למחיר מוצר בישראל?","choices":["מס הכנסה","מע\"מ","ארנונה","מס קנייה"],"correctIndex":1},
+  {"id":"gk-065","category":"מדע","difficulty":"בינונית","question":"מהו שם המולקולה שנושאת מידע תורשתי בתאים?","choices":["ATP","DNA","RNA","גלוקוז"],"correctIndex":1},
+
+  {"id":"gk-066","category":"תרבות","difficulty":"בינונית","question":"איזו מדינה מזוהה עם מוזיקת פלמנקו?","choices":["איטליה","ספרד","פורטוגל","יוון"],"correctIndex":1},
+  {"id":"gk-067","category":"גאוגרפיה","difficulty":"בינונית","question":"מהו המדבר הגדול ביותר בעולם?","choices":["סהרה","גובי","אטקמה","האנטארקטי (מדבר קוטבי)"],"correctIndex":3},
+  {"id":"gk-068","category":"מתמטיקה","difficulty":"קל","question":"מהו חצי מ-90?","choices":["40","45","50","55"],"correctIndex":1},
+  {"id":"gk-069","category":"היסטוריה","difficulty":"בינונית","question":"איזה קיר מפורסם בירושלים נחשב אתר קדוש ביהדות?","choices":["קיר החומה הסינית","הכותל המערבי","חומת אדריאנוס","חומת ברלין"],"correctIndex":1},
+  {"id":"gk-070","category":"מדע","difficulty":"בינונית","question":"איזו פלנטה מכונה \"הכוכב האדום\"?","choices":["נוגה","מאדים","צדק","שבתאי"],"correctIndex":1},
+
+  {"id":"gk-071","category":"ספרות","difficulty":"בינונית","question":"מי כתב את \"האודיסאה\"?","choices":["הומרוס","אפלטון","סופוקלס","אריסטו"],"correctIndex":0},
+  {"id":"gk-072","category":"מדע","difficulty":"בינונית","question":"איזה איבר בגוף אחראי בעיקר על שאיבת דם?","choices":["מוח","כבד","לב","כליות"],"correctIndex":2},
+  {"id":"gk-073","category":"גאוגרפיה","difficulty":"מתקדמת","question":"איזו עיר היא בירת דרום אפריקה מבחינה מנהלית (מושב הממשלה)?","choices":["קייפטאון","פרטוריה","יוהנסבורג","דרבן"],"correctIndex":1},
+  {"id":"gk-074","category":"תרבות","difficulty":"בינונית","question":"איזה חג מצוין בארצות הברית ביום חמישי הרביעי של נובמבר?","choices":["יום העצמאות","חג ההודיה","ליל כל הקדושים","חג המולד"],"correctIndex":1},
+  {"id":"gk-075","category":"כלכלה","difficulty":"מתקדמת","question":"מהו מונח המתאר מצב שבו מחירים עולים בזמן שהצמיחה נמוכה?","choices":["דפלציה","סטגנציה","סטגפלציה","אינפלציה מיובאת"],"correctIndex":2},
+
+  {"id":"gk-076","category":"מדע","difficulty":"מתקדמת","question":"איזו שכבה באטמוספרה מכילה את שכבת האוזון?","choices":["טרופוספרה","סטרטוספרה","מזוספרה","תרמוספרה"],"correctIndex":1},
+  {"id":"gk-077","category":"היסטוריה","difficulty":"בינונית","question":"איזה מכתב מפורסם חתם מרטין לותר קינג בשם \"I Have a Dream\"?","choices":["נאום","חוקה","מניפסט","חיבור מדעי"],"correctIndex":0},
+  {"id":"gk-078","category":"גאוגרפיה","difficulty":"בינונית","question":"מהי עיר הבירה של איטליה?","choices":["מילאנו","רומא","נאפולי","ונציה"],"correctIndex":1},
+  {"id":"gk-079","category":"מדע","difficulty":"בינונית","question":"איזה סוג דם נחשב \"תורם אוניברסלי\" בתרומת כדוריות אדומות?","choices":["AB+","O-","O+","AB-"],"correctIndex":1},
+  {"id":"gk-080","category":"תרבות","difficulty":"בינונית","question":"איזו מדינה מזוהה עם מאכל הסושי?","choices":["סין","יפן","תאילנד","קוריאה"],"correctIndex":1},
+
+  {"id":"gk-081","category":"מתמטיקה","difficulty":"בינונית","question":"כמה צלעות יש למחומש?","choices":["4","5","6","7"],"correctIndex":1},
+  {"id":"gk-082","category":"מדע","difficulty":"בינונית","question":"איזה גז בני אדם נושמים פנימה לצורך תהליך הנשימה?","choices":["חנקן","חמצן","הליום","מימן"],"correctIndex":1},
+  {"id":"gk-083","category":"היסטוריה","difficulty":"מתקדמת","question":"איזה מלך אנגלי חתם על המגנה כרטה בשנת 1215?","choices":["הנרי השמיני","ריצ'רד הראשון","ג'ון","אדוארד הראשון"],"correctIndex":2},
+  {"id":"gk-084","category":"גאוגרפיה","difficulty":"בינונית","question":"איזו מדינה כוללת את האי סיציליה?","choices":["יוון","איטליה","ספרד","צרפת"],"correctIndex":1},
+  {"id":"gk-085","category":"מדע","difficulty":"בינונית","question":"מהו שם האנרגיה האצורה במזון שמשתחררת בגוף?","choices":["אנרגיה גרעינית","אנרגיה כימית","אנרגיית קול","אנרגיה מגנטית"],"correctIndex":1},
+
+  {"id":"gk-086","category":"תרבות","difficulty":"בינונית","question":"איזו עיר נחשבת לבירת האופנה המזוהה עם שבוע האופנה הגדול?","choices":["ברלין","פריז","מדריד","ליסבון"],"correctIndex":1},
+  {"id":"gk-087","category":"מדע","difficulty":"בינונית","question":"איזה מדען ניסח את חוקי התנועה והכבידה הקלאסיים?","choices":["אלברט איינשטיין","אייזק ניוטון","ניקולה טסלה","גלילאו גליליי"],"correctIndex":1},
+  {"id":"gk-088","category":"גאוגרפיה","difficulty":"בינונית","question":"מהו הנהר הארוך ביותר באירופה?","choices":["הריין","הדנובה","הוולגה","הסיין"],"correctIndex":2},
+  {"id":"gk-089","category":"ספרות","difficulty":"בינונית","question":"מי כתב את \"עליסה בארץ הפלאות\"?","choices":["לואיס קרול","ג'יי. קיי. רולינג","רואלד דאל","מרק טוויין"],"correctIndex":0},
+  {"id":"gk-090","category":"כלכלה","difficulty":"בינונית","question":"איך נקראת עליית ערך של מטבע ביחס למטבעות אחרים?","choices":["פיחות","ייסוף","קיבוע","המרה"],"correctIndex":1},
+
+  {"id":"gk-091","category":"מדע","difficulty":"בינונית","question":"איזה איבר אחראי בעיקר על ויסות רמות הסוכר בדם?","choices":["לבלב","טחול","כיס מרה","תוספתן"],"correctIndex":0},
+  {"id":"gk-092","category":"היסטוריה","difficulty":"בינונית","question":"איזו תרבות עתיקה קשורה לכתב יתדות?","choices":["המצרים","השומרים","היוונים","הרומאים"],"correctIndex":1},
+  {"id":"gk-093","category":"גאוגרפיה","difficulty":"בינונית","question":"איזה ים נמצא בין אירופה לאפריקה?","choices":["הים הבלטי","הים האדום","הים התיכון","הים השחור"],"correctIndex":2},
+  {"id":"gk-094","category":"תרבות","difficulty":"בינונית","question":"איזו יצירה היא של בטהובן?","choices":["ארבע העונות","הסימפוניה התשיעית","מולדתי","כרמן"],"correctIndex":1},
+  {"id":"gk-095","category":"מדע","difficulty":"בינונית","question":"איזו יחידת מידה משמשת למדידת טמפרטורה במערכת SI?","choices":["פרנהייט","קלווין","צלזיוס","מעלות"],"correctIndex":1},
+
+  {"id":"gk-096","category":"מתמטיקה","difficulty":"קל","question":"מהו הערך של 12+15?","choices":["25","26","27","28"],"correctIndex":2},
+  {"id":"gk-097","category":"היסטוריה","difficulty":"מתקדמת","question":"מה היה שם הספינה שבה הפליג צ'ארלס דרווין במסעו המפורסם?","choices":["ויקטורי","ביגל","אנדוור","סנטה מריה"],"correctIndex":1},
+  {"id":"gk-098","category":"גאוגרפיה","difficulty":"בינונית","question":"איזו מדינה ידועה כ\"ארץ אלף האגמים\"?","choices":["נורווגיה","שוודיה","פינלנד","איסלנד"],"correctIndex":2},
+  {"id":"gk-099","category":"מדע","difficulty":"בינונית","question":"מהו שם התופעה שבה גוף מאבד חום לסביבה?","choices":["הולכה","קרינה","התקררות","עיבוי"],"correctIndex":2},
+  {"id":"gk-100","category":"תרבות","difficulty":"בינונית","question":"איזו מדינה מזוהה עם פסטיבל קרנבל בריו?","choices":["ספרד","ברזיל","פורטוגל","איטליה"],"correctIndex":1}
+  ];
+
+  // --- 2) מצב אפליקציה ---
+  const STORAGE_KEY = "gk_quiz_asked_ids_v1";
+
+  let score = 0;
+  let currentQ = null;
+  let locked = false;
+
+  function loadAskedIds() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return new Set();
+      const arr = JSON.parse(raw);
+      return new Set(Array.isArray(arr) ? arr : []);
+    } catch {
+      return new Set();
+    }
+  }
+
+  function saveAskedIds(set) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([...set]));
+  }
+
+  function getAvailableQuestions() {
+    const asked = loadAskedIds();
+    return QUESTION_BANK.filter(q => !asked.has(q.id));
+  }
+
+  function updateStats() {
+    const asked = loadAskedIds();
+    document.getElementById("score").textContent = String(score);
+    document.getElementById("asked").textContent = String(asked.size);
+    document.getElementById("remaining").textContent = String(getAvailableQuestions().length);
+  }
+
+  function shuffle(array) {
+    const a = array.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function pickNextQuestion() {
+    const available = getAvailableQuestions();
+    if (available.length === 0) return null;
+    // בחירה אקראית
+    const q = available[Math.floor(Math.random() * available.length)];
+    return q;
+  }
+
+  function renderQuestion(q) {
+    currentQ = q;
+    locked = false;
+
+    document.getElementById("category").textContent = q.category;
+    document.getElementById("difficulty").textContent = q.difficulty;
+    document.getElementById("question").textContent = q.question;
+
+    const answersEl = document.getElementById("answers");
+    answersEl.innerHTML = "";
+
+    // שומרים את האינדקס המקורי, כדי לזהות נכון תשובה גם אם נרצה לערבב בהמשך
+    // (כאן לא מערבבים, אבל המבנה מוכן)
+    const indexedChoices = q.choices.map((text, idx) => ({ text, idx }));
+
+    indexedChoices.forEach(({ text, idx }) => {
+      const btn = document.createElement("button");
+      btn.className = "answer";
+      btn.type = "button";
+      btn.textContent = text;
+      btn.addEventListener("click", () => onAnswer(idx, btn));
+      answersEl.appendChild(btn);
+    });
+
+    const feedback = document.getElementById("feedback");
+    feedback.style.display = "none";
+    feedback.className = "feedback";
+    feedback.textContent = "";
+
+    document.getElementById("nextBtn").disabled = true;
+
+    updateStats();
+  }
+
+  function onAnswer(chosenIndex, chosenBtn) {
+    if (locked || !currentQ) return;
+    locked = true;
+
+    const correct = currentQ.correctIndex === chosenIndex;
+
+    const feedback = document.getElementById("feedback");
+    feedback.style.display = "block";
+    feedback.className = "feedback " + (correct ? "good" : "bad");
+
+    // ננעל כפתורים ונציג סימון עדין
+    const allButtons = [...document.querySelectorAll("button.answer")];
+    allButtons.forEach((b, idx) => {
+      b.disabled = true;
+      if (idx === currentQ.correctIndex) {
+        b.style.borderColor = "rgba(185,246,208,0.55)";
+        b.style.background = "rgba(185,246,208,0.10)";
+      }
+    });
+
+    if (correct) {
+      score += 1;
+      feedback.textContent = "נכון.";
+    } else {
+      chosenBtn.style.borderColor = "rgba(255,182,182,0.55)";
+      chosenBtn.style.background = "rgba(255,182,182,0.10)";
+      const correctText = currentQ.choices[currentQ.correctIndex];
+      feedback.textContent = `לא נכון. התשובה הנכונה: ${correctText}`;
+    }
+
+    // מסמנים את השאלה כנשאלה (כדי שלא תחזור)
+    const asked = loadAskedIds();
+    asked.add(currentQ.id);
+    saveAskedIds(asked);
+
+    document.getElementById("nextBtn").disabled = false;
+    updateStats();
+  }
+
+  function next() {
+    const q = pickNextQuestion();
+    if (!q) {
+      // אין עוד שאלות
+      document.getElementById("category").textContent = "—";
+      document.getElementById("difficulty").textContent = "—";
+      document.getElementById("question").textContent = "נגמרו השאלות הזמינות במאגר (לפי היסטוריית 'נשאלו').";
+      document.getElementById("answers").innerHTML = "";
+      const feedback = document.getElementById("feedback");
+      feedback.style.display = "block";
+      feedback.className = "feedback";
+      feedback.textContent = "אפשר למחוק היסטוריה כדי להתחיל מחדש, או להוסיף שאלות חדשות למאגר.";
+      document.getElementById("nextBtn").disabled = true;
+      updateStats();
+      return;
+    }
+    renderQuestion(q);
+  }
+
+  // --- 3) כפתורים ---
+  document.getElementById("nextBtn").addEventListener("click", next);
+
+  document.getElementById("resetSessionBtn").addEventListener("click", () => {
+    // מאפס ניקוד בלבד (היסטוריית נשאלו נשארת)
+    score = 0;
+    updateStats();
+  });
+
+  document.getElementById("clearHistoryBtn").addEventListener("click", () => {
+    localStorage.removeItem(STORAGE_KEY);
+    score = 0;
+    next();
+  });
+
+  // --- 4) אתחול ---
+  updateStats();
+  next();
+</script>
+</body>
+</html>
