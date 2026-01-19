@@ -225,6 +225,25 @@
   -webkit-backdrop-filter: blur(6px);
 }
 
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9999;
+}
+
+.modal.show{
+  display:block;
+}
+
+.modal-backdrop{
+  position:absolute;
+  inset:0;
+  background: rgba(5, 8, 18, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
 .modal-card{
   position:relative;
   width:min(460px, calc(100% - 32px));
@@ -287,8 +306,8 @@
   .modal-actions .btn{
     width:100%;
   }
-
 }
+
   </style>
 </head>
 <body>
@@ -699,6 +718,7 @@ document.getElementById("modalBackdrop").addEventListener("click", closeConfirmM
 </script>
 </body>
 </html>
+
 
 
 
