@@ -188,25 +188,7 @@
       .reset-group{ justify-content: stretch; }
       .reset-group .btn{ width: 100%; }
     }
-    .modal{
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index: 9999;
-}
-
-.modal.show{
-  display:block;
-}
-
-.modal-backdrop{
-  position:absolute;
-  inset:0;
-  background: rgba(0,0,0,0.55);
-}
-
-.modal-card{
- .modal{
+   .modal{
   display:none;
   position:fixed;
   inset:0;
@@ -214,26 +196,9 @@
 }
 
 .modal.show{
-  display:block;
-}
-
-.modal-backdrop{
-  position:absolute;
-  inset:0;
-  background: rgba(5, 8, 18, 0.72);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-
-.modal{
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index:9999;
-}
-
-.modal.show{
-  display:block;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 .modal-backdrop{
@@ -247,7 +212,6 @@
 .modal-card{
   position:relative;
   width:min(460px, calc(100% - 32px));
-  margin: 16vh auto 0 auto;
   background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)), var(--card);
   border:1px solid rgba(255,255,255,0.12);
   border-radius:20px;
@@ -267,7 +231,6 @@
 .modal-actions{
   display:flex;
   gap:10px;
-  justify-content:flex-start;
 }
 
 .modal-actions .btn{
@@ -294,12 +257,8 @@
 }
 
 @media (max-width:560px){
-  .modal-card{
-    margin:18vh auto 0 auto;
-    padding:18px;
-  }
-
   .modal-actions{
+    flex-direction: column;
     gap:12px;
   }
 
@@ -718,6 +677,7 @@ document.getElementById("modalBackdrop").addEventListener("click", closeConfirmM
 </script>
 </body>
 </html>
+
 
 
 
