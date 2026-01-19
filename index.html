@@ -505,18 +505,29 @@
     document.getElementById("checkpoint").style.display = "none";
   }
 
-  function showCheckpoint(){
-    const titleEl = document.getElementById("checkpointTitle");
-    const textEl = document.getElementById("checkpointText");
-    const cp = document.getElementById("checkpoint");
+function showCheckpoint(){
+  const titleEl = document.getElementById("checkpointTitle");
+  const textEl = document.getElementById("checkpointText");
+  const cp = document.getElementById("checkpoint");
 
-    titleEl.textContent = "עצירה קטנה";
-    textEl.textContent =
-      `איזה כיף! ענית נכון על ${batchCorrect} מתוך ${CHECKPOINT_EVERY} שאלות בסבב הזה. ` +
-      `ממש מרשים. שנמשיך לסיבוב הבא?`;
+  titleEl.textContent = "עצירה קטנה";
 
-    cp.style.display = "block";
+  let suffix = "";
+  if (batchCorrect === 20) {
+    suffix = " מושלם!";
+  } else if (batchCorrect >= 16) {
+    suffix = " מעולה!";
+  } else if (batchCorrect >= 11) {
+    suffix = " יפה!";
+  } else {
+    suffix = "";
   }
+
+  textEl.textContent =
+    `ענית נכון על ${batchCorrect} מתוך ${CHECKPOINT_EVERY} שאלות בסיבוב הזה.${suffix} שנמשיך לסיבוב הבא?`;
+
+  cp.style.display = "block";
+}
 
   function renderQuestion(q) {
     currentQ = q;
@@ -679,6 +690,7 @@ document.getElementById("modalBackdrop").addEventListener("click", closeConfirmM
 </script>
 </body>
 </html>
+
 
 
 
