@@ -188,6 +188,46 @@
       .reset-group{ justify-content: stretch; }
       .reset-group .btn{ width: 100%; }
     }
+    .modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index: 9999;
+}
+
+.modal.show{
+  display:block;
+}
+
+.modal-backdrop{
+  position:absolute;
+  inset:0;
+  background: rgba(0,0,0,0.55);
+}
+
+.modal-card{
+  position:relative;
+  width:min(420px, calc(100% - 32px));
+  margin: 18vh auto 0 auto;
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+  border:1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+.modal-title{
+  font-size:16px;
+  font-weight:700;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.modal-actions{
+  display:flex;
+  gap:10px;
+  justify-content:flex-end;
+}
   </style>
 </head>
 <body>
@@ -239,6 +279,18 @@
       טיפ: כדי להוסיף שאלות בעתיד, מוסיפים אובייקטים חדשים בתוך <code>QUESTION_BANK</code>.
     </footer>
   </div>
+<!-- Confirmation Modal -->
+<div class="modal" id="confirmModal" aria-hidden="true">
+  <div class="modal-backdrop" id="modalBackdrop"></div>
+
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-title" id="modalTitle">כותרת</div>
+    <div class="modal-actions">
+      <button class="btn" id="modalYesBtn" type="button">כן</button>
+      <button class="btn secondary" id="modalNoBtn" type="button">לא</button>
+    </div>
+  </div>
+</div>
 
 <script>
   // correctIndex הוא 0-3 בהתאם למיקום התשובה ב-choices
@@ -534,22 +586,51 @@
     batchAnswered = 0;
     next();
   });
+let pendingAction = null;
+
+function openConfirmModal(title, action) {
+  pendingAction = action;
+
+  document.getElementById("modalTitle").textContent = title;
+  const modal = document.getElementById("confirmModal");
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden", "false");
+}
+
+function closeConfirmModal() {
+  pendingAction = null;
+
+  const modal = document.getElementById("confirmModal");
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden", "true");
+}
+document.getElementById("modalYesBtn").addEventListener("click", () => {
+  if (typeof pendingAction === "function") pendingAction();
+  closeConfirmModal();
+});
+
+document.getElementById("modalNoBtn").addEventListener("click", closeConfirmModal);
+document.getElementById("modalBackdrop").addEventListener("click", closeConfirmModal);
 
   document.getElementById("resetSessionBtn").addEventListener("click", () => {
+  openConfirmModal("לאפס את הניקוד?", () => {
     score = 0;
     batchCorrect = 0;
     batchAnswered = 0;
     hideCheckpoint();
     updateStats();
+});
   });
 
   document.getElementById("clearHistoryBtn").addEventListener("click", () => {
+  openConfirmModal("להתחיל מחדש?", () => {
     localStorage.removeItem(STORAGE_KEY);
     score = 0;
     batchCorrect = 0;
     batchAnswered = 0;
     hideCheckpoint();
     next();
+});
   });
 
   updateStats();
@@ -557,4 +638,5 @@
 </script>
 </body>
 </html>
+
 
