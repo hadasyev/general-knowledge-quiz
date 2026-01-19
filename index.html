@@ -206,27 +206,88 @@
 }
 
 .modal-card{
+ .modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9999;
+}
+
+.modal.show{
+  display:block;
+}
+
+.modal-backdrop{
+  position:absolute;
+  inset:0;
+  background: rgba(5, 8, 18, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.modal-card{
   position:relative;
-  width:min(420px, calc(100% - 32px));
-  margin: 18vh auto 0 auto;
-  background: var(--card);
-  border:1px solid var(--border);
-  border-radius: 16px;
-  box-shadow: var(--shadow);
-  padding: 16px;
+  width:min(460px, calc(100% - 32px));
+  margin: 16vh auto 0 auto;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)), var(--card);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:20px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+  padding: 18px 18px 14px 18px;
 }
 
 .modal-title{
-  font-size:16px;
-  font-weight:700;
+  font-size:18px;
+  font-weight:750;
+  letter-spacing:0.2px;
   color: var(--text);
-  margin-bottom: 14px;
+  margin-bottom:14px;
+  line-height:1.35;
 }
 
 .modal-actions{
   display:flex;
   gap:10px;
-  justify-content:flex-end;
+  justify-content:flex-start;
+}
+
+.modal-actions .btn{
+  padding:10px 14px;
+  border-radius:14px;
+}
+
+.modal-actions #modalYesBtn{
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.18);
+}
+
+.modal-actions #modalYesBtn:hover{
+  background: rgba(255,255,255,0.18);
+}
+
+.modal-actions #modalNoBtn{
+  background: rgba(0,0,0,0.18);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.modal-actions #modalNoBtn:hover{
+  background: rgba(255,255,255,0.06);
+}
+
+@media (max-width:560px){
+  .modal-card{
+    margin:18vh auto 0 auto;
+    padding:18px;
+  }
+
+  .modal-actions{
+    gap:12px;
+  }
+
+  .modal-actions .btn{
+    width:100%;
+  }
+
 }
   </style>
 </head>
@@ -638,6 +699,7 @@ document.getElementById("modalBackdrop").addEventListener("click", closeConfirmM
 </script>
 </body>
 </html>
+
 
 
 
