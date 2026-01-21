@@ -589,17 +589,48 @@ function showCheckpoint(){
   cp.style.display = "block";
 }
 
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function makeShuffledQuestion(q) {
+  const tagged = q.choices.map((text, idx) => ({
+    text,
+    isCorrect: idx === q.correctIndex
+  }));
+
+  const shuffled = shuffleArray(tagged);
+
+  const newChoices = shuffled.map(x => x.text);
+  const newCorrectIndex = shuffled.findIndex(x => x.isCorrect);
+
+  if (newCorrectIndex === -1) {
+    return { ...q };
+  }
+
+  return {
+    ...q,
+    choices: newChoices,
+    correctIndex: newCorrectIndex
+  };
+}
+  
   function renderQuestion(q) {
-    currentQ = q;
+    currentQ = makeShuffledQuestion(q);
     locked = false;
 
-    document.getElementById("category").textContent = q.category || "כללי";
-    document.getElementById("question").textContent = q.question;
+    document.getElementById("category").textContent = currentQ.category || "כללי";
+    document.getElementById("question").textContent = currentQ.question;
 
     const answersEl = document.getElementById("answers");
     answersEl.innerHTML = "";
 
-    q.choices.forEach((text, idx) => {
+    currentQ.choices.forEach((text, idx) => {
       const btn = document.createElement("button");
       btn.className = "answer";
       btn.type = "button";
@@ -750,6 +781,7 @@ document.getElementById("modalBackdrop").addEventListener("click", closeConfirmM
 </script>
 </body>
 </html>
+
 
 
 
