@@ -299,7 +299,7 @@
 
         <div class="checkpoint" id="checkpoint">
           <div class="checkpoint-box">
-            <div class="checkpoint-title" id="checkpointTitle">עצירה קטנה</div>
+            <div class="checkpoint-title" id="checkpointTitle">הגעת לסוף הסיבוב 🎉</div>
             <div class="checkpoint-text" id="checkpointText"></div>
             <button class="btn" id="continueBtn" type="button">ממשיכים!</button>
           </div>
@@ -707,7 +707,6 @@ function makeShuffledQuestion(q) {
   }
 
   function next() {
-    // עצירה כל 20 שאלות לפני שממשיכים לשאלה הבאה
     if (batchAnswered > 0 && batchAnswered % CHECKPOINT_EVERY === 0) {
       showCheckpoint();
       return;
@@ -781,6 +780,7 @@ document.getElementById("modalBackdrop").addEventListener("click", closeConfirmM
 </script>
 </body>
 </html>
+
 
 
 
